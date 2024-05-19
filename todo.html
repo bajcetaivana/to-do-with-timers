@@ -4,143 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List with Timers</title>
+    <link rel="stylesheet" href="todo.css">
 </head>
 <body>
     <input type="text" id="newtodo"/>
-    <button onclick="add()" type="button">Click Me!</button>
-    <div> Count:</div>
-    <div id="count"></div>
-    <ul id="todolist"></ul>
-	<div> Total time spent <span id="totalTimeSpent"></span><div>
-
-    <script>
-        function observable() {
-            let state;
-            const subscribers = [];
-            function set(val){
-                state = val;
-                for (const cb of subscribers) {
-                    cb(val);
-                }
-            }
-
-            function subscribe(cb) {
-                subscribers.push(cb);
-            }
-            function get(){
-                return state;
-            }
-            return {
-                set,
-                subscribe,
-                get,
-            }
-        }
-
-        const count = observable();
-        count.subscribe((val)=> console.log("todos: " + val));
-        count.subscribe((val)=> document.getElementById("count").textContent=val);
-        count.set(0);
-
-        const timers = [];
-
-        function add(){
-            const text = document.getElementById("newtodo").value;
-            const node = document.createElement("li");
-            const textnode = document.createTextNode(text);
-            node.id = count.get();
-            node.appendChild(textnode);
-            document.getElementById("todolist").appendChild(node);
-			addStartStopButtons(node);
-            count.set(count.get()+1);
-        }
-
-        function addStartStopButtons(node) {
-			let wholeTime;
-            let interval;
-            let elapsedTime = 0;
-            let startTime;
-
-            const buttonStartNode = document.createElement("button");
-            buttonStartNode.textContent = "Start";
-            const buttonStopNode = document.createElement("button");
-            buttonStartNode.id = count.get();
-            buttonStopNode.id = count.get();
-            buttonStopNode.textContent = "Stop";
-            buttonStopNode.setAttribute('disabled', '');
-            node.appendChild(buttonStartNode);
-            node.appendChild(buttonStopNode);
-
-            buttonStartNode.addEventListener('click', function() {
-                buttonStartNode.setAttribute('disabled', '');
-                buttonStopNode.removeAttribute('disabled');
-
-                console.log(startTime, node);
-                startTime = new Date();
-                interval = startTimer(node, elapsedTime, startTime);
-            })
-
-            buttonStopNode.addEventListener('click', function() {
-                buttonStartNode.removeAttribute('disabled');
-                buttonStopNode.setAttribute('disabled', '');
-                clearInterval(interval);
-                elapsedTime += new Date() - startTime;
-                startTime = null;
-            })
-        }
-
-        function startTimer(node, elapsedTime, startTime) {
-            const idValue = node.id + "_time";
-            let timer;
-            if (!document.getElementById(idValue)) {
-                timer = document.createElement("button");
-                timer.id = idValue;
-                node.appendChild(timer);
-            } else {
-                timer = document.getElementById(idValue);
-            }
-
-            function updateTime() {
-                const now = new Date();
-                const currentElapsedTime = now - startTime + elapsedTime;
-				timers[node.id] = currentElapsedTime;
-				console.log('timers', timers);
-				const sum = sumOfTimers(timers);
-				document.getElementById('totalTimeSpent').textContent = sum;
-				console.log('sum', sum);
-				console.log('currentElapsedTime', currentElapsedTime);
-
-
-
-                timer.textContent = 'Time: ' +  formattedTime(currentElapsedTime);
-            }
-            startTime = new Date();
-            const interval = setInterval(updateTime, 1000);
-            updateTime();
-            return interval;
-        }
-
-		function formattedTime(currentElapsedTime) {
-			const hours = Math.floor(currentElapsedTime / (1000 * 60 * 60));
-                const minutes = Math.floor((currentElapsedTime % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((currentElapsedTime % (1000 * 60)) / 1000);
-                const formattedTime = 
-                    String(hours).padStart(2, '0') + ':' + 
-                    String(minutes).padStart(2, '0') + ':' + 
-                    String(seconds).padStart(2, '0');
-				return formattedTime;
-		}
-
-		function sumOfTimers() {
-			let sumOfTimes = 0;
-			for (const timer of timers) {
-				if (timer){
-					sumOfTimes += timer;
-				}
-			}
-			return formattedTime(sumOfTimes);
-
-		}
-    </script>
+    <button onclick="add()" type="button" disabled id="addButton">Click Me!</button>
+    <div>
+        <span> Count:</span>
+        <span id="count"></span>
+    </div>
+    <ul id="todolist" class="todo"></ul>
+    <div> Total time spent <span id="totalTimeSpent"></span></div>
+    <script type="text/javascript" src="./todo.js"></script>
 </body>
 </html>
